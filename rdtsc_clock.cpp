@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <x86intrin.h>
 #include <cpuid.h>
 
@@ -10,12 +12,14 @@ namespace RDTSC_Clock {
         return ((static_cast<double>(ecx_hz) * ebx_numerator) / eax_denominator) / 1e9;
     }
 
-    const double internal::RDTSC_TICK_FREQ = GET_RDTSC_TICK_FREQ();
+    double internal::RDTSC_TICK_FREQ;
     unsigned int temp;
     unsigned long long internal::initialTimestamp;
     unsigned long long internal::initialCycles;
 
     void init() {
+        internal::RDTSC_TICK_FREQ = GET_RDTSC_TICK_FREQ();
+        std::cout << "RDTSC_TICK_FREQ: " << internal::RDTSC_TICK_FREQ << '\n';
         internal::initialTimestamp  = std::chrono::system_clock::now().time_since_epoch().count();
         internal::initialCycles = __rdtscp(&temp);
     }
