@@ -1,7 +1,8 @@
 #include "rdtsc_clock.hpp"
 
+#include <iostream>
+
 #include <x86intrin.h>
-#include <thread>
 
 int main() {
     unsigned int temp;

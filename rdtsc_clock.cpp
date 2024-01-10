@@ -3,8 +3,6 @@
 
 #include "rdtsc_clock.hpp"
 
-#include <iostream>
-
 namespace RDTSC_Clock {
     static double GET_RDTSC_TICK_FREQ() {
         unsigned int eax_denominator, ebx_numerator, ecx_hz, edx;
@@ -14,7 +12,7 @@ namespace RDTSC_Clock {
 
     const double internal::RDTSC_TICK_FREQ = GET_RDTSC_TICK_FREQ();
     unsigned int temp;
-    uint64_t internal::initialTimestamp;
+    unsigned long long internal::initialTimestamp;
     unsigned long long internal::initialCycles;
 
     void init() {
@@ -23,6 +21,6 @@ namespace RDTSC_Clock {
     }
 
     unsigned long long now(unsigned long long elapsedCycles) {    
-        return (internal::initialTimestamp + static_cast<uint64_t>(static_cast<long double>(elapsedCycles - internal::initialCycles) / internal::RDTSC_TICK_FREQ));
+        return (internal::initialTimestamp + static_cast<unsigned long long>(static_cast<long double>(elapsedCycles - internal::initialCycles) / internal::RDTSC_TICK_FREQ));
     }
 }
