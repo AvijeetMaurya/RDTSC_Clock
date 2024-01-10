@@ -6,7 +6,6 @@
 
 int main() {
     unsigned int temp;
-    timespec ts;
     RDTSC_Clock::init();
     while (true) {  
         auto now = std::chrono::system_clock::now();
