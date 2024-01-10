@@ -11,5 +11,6 @@ namespace RDTSC_Clock {
     }
     void init();
     unsigned long long now(unsigned long long elapsedCycles);
+    void exit();
 }
 

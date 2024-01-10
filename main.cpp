@@ -14,4 +14,5 @@ int main() {
         long long rdtscp_timestamp = RDTSC_Clock::now(cycles);
         std::cout << "Delta: " << rdtscp_timestamp - system_timestamp << '\n';
     }
+    RDTSC_Clock::exit();
 }
