@@ -5,7 +5,7 @@
 
 namespace RDTSC_Clock {
     namespace internal {
-        extern const double RDTSC_TICK_FREQ;
+        extern double RDTSC_TICK_FREQ;
         extern unsigned long long initialTimestamp;
         extern unsigned long long initialCycles;
     }
