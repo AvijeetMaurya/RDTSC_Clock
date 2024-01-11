@@ -10,9 +10,8 @@ namespace RDTSC_Clock {
     static double GET_NS_PER_RDTSC_TICK() {
         unsigned int eax_denominator, ebx_numerator, ecx_hz, edx;
         __get_cpuid(0x15, &eax_denominator, &ebx_numerator, &ecx_hz, &edx);
-        std::cout << eax_denominator * 1e9 << ' ' << ecx_hz * ebx_numerator << '\n';
-        return (eax_denominator * 1e9) / (ecx_hz * ebx_numerator);
-        //return ((static_cast<double>(ecx_hz) * ebx_numerator) / eax_denominator) / 1e9;
+        std::cout << eax_denominator  << ' ' << ecx_hz << ' ' << ebx_numerator << '\n';
+        return (eax_denominator * 1e9) / (static_cast<double>(ecx_hz) * ebx_numerator);
     }
 
     double internal::RDTSC_TICK_TO_NS;
@@ -28,9 +27,7 @@ namespace RDTSC_Clock {
     }
 
     void init() {
-        //internal::RDTSC_TICK_TO_NS = 1 / GET_RDTSC_TICK_FREQ();
         internal::RDTSC_TICK_TO_NS = GET_NS_PER_RDTSC_TICK();
-        std::cout << "RDTSC_TICK_FREQ: " << internal::RDTSC_TICK_TO_NS << '\n';
         internal::timestamp = std::chrono::system_clock::now().time_since_epoch().count() - (__rdtscp(&temp) * internal::RDTSC_TICK_TO_NS);
 
         worker = std::jthread(sync, std::ref(internal::timestamp));
