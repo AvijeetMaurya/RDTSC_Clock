@@ -10,7 +10,6 @@ namespace RDTSC_Clock {
     static double GET_NS_PER_RDTSC_TICK() {
         unsigned int eax_denominator, ebx_numerator, ecx_hz, edx;
         __get_cpuid(0x15, &eax_denominator, &ebx_numerator, &ecx_hz, &edx);
-        std::cout << eax_denominator  << ' ' << ecx_hz << ' ' << ebx_numerator << '\n';
         return (eax_denominator * 1e9) / (static_cast<double>(ecx_hz) * ebx_numerator);
     }
 
