@@ -9,7 +9,7 @@ namespace RDTSC_Clock {
         extern unsigned long long timestamp;
     }
     void init();
-    unsigned long long now(unsigned long long elapsedCycles);
+    unsigned long long now();
     void exit();
 }
 

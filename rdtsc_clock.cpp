@@ -39,8 +39,8 @@ namespace RDTSC_Clock {
         */
     }
 
-    unsigned long long now(unsigned long long elapsedCycles) {
-        return internal::timestamp + static_cast<unsigned long long>(elapsedCycles / internal::RDTSC_TICK_FREQ);
+    unsigned long long now() {
+        return internal::timestamp + static_cast<unsigned long long>(__rdtscp(&temp) / internal::RDTSC_TICK_FREQ);
     }
 
     void exit() {

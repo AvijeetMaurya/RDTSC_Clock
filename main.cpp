@@ -2,16 +2,13 @@
 
 #include <iostream>
 
-#include <x86intrin.h>
-
 int main() {
     unsigned int temp;
     RDTSC_Clock::init();
     while (true) {  
         auto now = std::chrono::system_clock::now();
+        long long rdtscp_timestamp = RDTSC_Clock::now();
         long long system_timestamp = now.time_since_epoch().count();
-        unsigned long long cycles = __rdtscp(&temp);
-        long long rdtscp_timestamp = RDTSC_Clock::now(cycles);
         std::cout << "Delta: " << rdtscp_timestamp - system_timestamp << '\n';
     }
     RDTSC_Clock::exit();
