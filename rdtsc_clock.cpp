@@ -13,7 +13,7 @@ namespace RDTSC_Clock {
         return ((static_cast<double>(ecx_hz) * ebx_numerator) / eax_denominator) / 1e9;
     }
 
-    double internal::RDTSC_TICK_FREQ;
+    double internal::RDTSC_TICK_TO_NS;
     unsigned int temp;
     unsigned long long internal::timestamp;
     std::jthread worker;
@@ -21,14 +21,14 @@ namespace RDTSC_Clock {
     void sync(std::stop_token status, unsigned long long& initialTimestamp) {
         while (!status.stop_requested()) {
             std::this_thread::sleep_for(std::chrono::seconds(10));
-            initialTimestamp = std::chrono::system_clock::now().time_since_epoch().count() - (__rdtscp(&temp) / internal::RDTSC_TICK_FREQ);
+            initialTimestamp = std::chrono::system_clock::now().time_since_epoch().count() - (__rdtscp(&temp) * internal::RDTSC_TICK_TO_NS);
         }
     }
 
     void init() {
-        internal::RDTSC_TICK_FREQ = GET_RDTSC_TICK_FREQ();
+        internal::RDTSC_TICK_TO_NS = 1 / GET_RDTSC_TICK_FREQ();
         //std::cout << "RDTSC_TICK_FREQ: " << internal::RDTSC_TICK_FREQ << '\n';
-        internal::timestamp = std::chrono::system_clock::now().time_since_epoch().count() - (__rdtscp(&temp) / internal::RDTSC_TICK_FREQ);
+        internal::timestamp = std::chrono::system_clock::now().time_since_epoch().count() - (__rdtscp(&temp) * internal::RDTSC_TICK_TO_NS);
 
         worker = std::jthread(sync, std::ref(internal::timestamp));
         /* Pin to specific CPU
@@ -40,7 +40,7 @@ namespace RDTSC_Clock {
     }
 
     unsigned long long now() {
-        return internal::timestamp + static_cast<unsigned long long>(__rdtscp(&temp) / internal::RDTSC_TICK_FREQ);
+        return internal::timestamp + static_cast<unsigned long long>(__rdtscp(&temp) * internal::RDTSC_TICK_TO_NS);
     }
 
     void exit() {

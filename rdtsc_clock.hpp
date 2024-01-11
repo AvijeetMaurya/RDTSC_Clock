@@ -5,7 +5,7 @@
 
 namespace RDTSC_Clock {
     namespace internal {
-        extern double RDTSC_TICK_FREQ;
+        extern double RDTSC_TICK_TO_NS;
         extern unsigned long long timestamp;
     }
     void init();
