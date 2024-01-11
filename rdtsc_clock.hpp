@@ -6,8 +6,12 @@
 namespace RDTSC_Clock {
     namespace internal {
         extern double RDTSC_TICK_FREQ;
-        extern unsigned long long initialTimestamp;
-        extern unsigned long long initialCycles;
+        struct InitialState {
+        unsigned long long timestamp;
+        unsigned long long cycles;
+        };
+        static_assert(sizeof(InitialState) <= 16);
+        extern InitialState initialState;
     }
     void init();
     unsigned long long now(unsigned long long elapsedCycles);

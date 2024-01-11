@@ -1,5 +1,4 @@
 #include <iostream>
-#include <semaphore>
 #include <thread>
 
 #include <x86intrin.h>
@@ -16,28 +15,24 @@ namespace RDTSC_Clock {
 
     double internal::RDTSC_TICK_FREQ;
     unsigned int temp;
-    std::binary_semaphore initialState{1};
-    unsigned long long internal::initialTimestamp;
-    unsigned long long internal::initialCycles;
+    internal::InitialState initialState;
     std::jthread worker;
 
-    void sync(std::stop_token status, unsigned long long& initialTimestamp, unsigned long long& initialCycles) {
+    void sync(std::stop_token status, internal::InitialState& initialState) {
         while (!status.stop_requested()) {
             std::this_thread::sleep_for(std::chrono::seconds(10));
-            initialState.acquire();
-            initialTimestamp = std::chrono::system_clock::now().time_since_epoch().count();
-            initialCycles = __rdtscp(&temp);
-            initialState.release();
+            initialState.timestamp = std::chrono::system_clock::now().time_since_epoch().count();
+            initialState.cycles = __rdtscp(&temp);
         }
     }
 
     void init() {
         internal::RDTSC_TICK_FREQ = GET_RDTSC_TICK_FREQ();
-        std::cout << "RDTSC_TICK_FREQ: " << internal::RDTSC_TICK_FREQ << '\n';
-        internal::initialTimestamp  = std::chrono::system_clock::now().time_since_epoch().count();
-        internal::initialCycles = __rdtscp(&temp);
+        //std::cout << "RDTSC_TICK_FREQ: " << internal::RDTSC_TICK_FREQ << '\n';
+        initialState.timestamp  = std::chrono::system_clock::now().time_since_epoch().count();
+        initialState.cycles = __rdtscp(&temp);
 
-        worker = std::jthread(sync, std::ref(internal::initialTimestamp), std::ref(internal::initialCycles));
+        worker = std::jthread(sync, std::ref(initialState));
         /* Pin to specific CPU
         cpu_set_t cpuset;
         CPU_ZERO(&cpuset);
@@ -47,13 +42,12 @@ namespace RDTSC_Clock {
     }
 
     unsigned long long now(unsigned long long elapsedCycles) {
-        initialState.acquire();
-        auto timestamp = (internal::initialTimestamp + static_cast<unsigned long long>(static_cast<long double>(elapsedCycles - internal::initialCycles) / internal::RDTSC_TICK_FREQ));
-        initialState.release();
+        auto timestamp = (initialState.timestamp + static_cast<unsigned long long>(static_cast<long double>(elapsedCycles - initialState.cycles) / internal::RDTSC_TICK_FREQ));
         return timestamp;
     }
 
     void exit() {
         worker.request_stop();
+        worker.detach();
     }
 }
